@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import { FlatList, StyleSheet, View, Text, TouchableOpacity, Button } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -8,14 +8,28 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 //https://reactnavigation.org/
 
-// https://snack.expo.io/?platform=android&name=Moving%20between%20screens%20%7C%20React%20Navigation&dependencies=%40react-native-community%2Fmasked-view%40%5E0.1.7%2C%40react-navigation%2Fbottom-tabs%40%5E5.6.0%2C%40react-navigation%2Fdrawer%40%5E5.8.3%2C%40react-navigation%2Fmaterial-bottom-tabs%40%5E5.2.11%2C%40react-navigation%2Fmaterial-top-tabs%40%5E5.2.11%2C%40react-navigation%2Fnative%40%5E5.6.0%2C%40react-navigation%2Fstack%40%5E5.6.1%2Creact-native-paper%40%5E3.10.1%2Creact-native-reanimated%40%5E1.7.0%2Creact-native-safe-area-context%40%5E0.7.3%2Creact-native-screens%40%5E2.4.0%2Creact-native-tab-view%40%5E2.14.0&sourceUrl=https%3A%2F%2Freactnavigation.org%2Fexamples%2F5.x%2Fgo-back.js
+//https://snack.expo.io/?platform=android&name=Moving%20between%20screens%20%7C%20React%20Navigation&dependencies=%40react-native-community%2Fmasked-view%40%5E0.1.7%2C%40react-navigation%2Fbottom-tabs%40%5E5.6.0%2C%40react-navigation%2Fdrawer%40%5E5.8.3%2C%40react-navigation%2Fmaterial-bottom-tabs%40%5E5.2.11%2C%40react-navigation%2Fmaterial-top-tabs%40%5E5.2.11%2C%40react-navigation%2Fnative%40%5E5.6.0%2C%40react-navigation%2Fstack%40%5E5.6.1%2Creact-native-paper%40%5E3.10.1%2Creact-native-reanimated%40%5E1.7.0%2Creact-native-safe-area-context%40%5E0.7.3%2Creact-native-screens%40%5E2.4.0%2Creact-native-tab-view%40%5E2.14.0&sourceUrl=https%3A%2F%2Freactnavigation.org%2Fexamples%2F5.x%2Fgo-back.js
 
 
-function HomeScreen({ navigation }) {    
+function HomeScreen({ navigation}) {
+
+    var {rep} = [];
+
+    fetch("https://jsonplaceholder.typicode.com/posts")
+                .then(res => res.json())
+                .then(res => {
+
+                    this.rep = res;
+                    
+                })
+                .catch(err => console.log('Fail', err))
+    
+    
+    console.log("Eita");
     var rowsUser = [];
-    //console.log(this.state.data)
+    console.log(navigation)
+    
     var pf = [];
-    const [datas, setDatas] = useState(fetchar(pf));
     var cont = 0;
     for (let i = 0; i < pf; i++) {
         cont = 0;
@@ -69,23 +83,6 @@ function Postagens2({ navigation }) {
     );
 }
 
-function fetchar(lista) {
-    if (lista.length === 0) {
-
-        fetch("https://jsonplaceholder.typicode.com/posts")
-            .then(res => res.json())
-            .then(res => {
-
-                this.setState({
-                    data: res || []
-                })
-
-            })
-            .catch(err => console.log('Fail', err))
-    }
-    
-}
-
 const Stack = createStackNavigator();
 
 export default class App extends Component {
@@ -118,11 +115,11 @@ export default class App extends Component {
 
     render() {
 
-
+        console.log(this.state.data);
         return (
-            <NavigationContainer>
-                <Stack.Navigator initialRouteName="App">
-                    <Stack.Screen name="Home" component={HomeScreen} initialParams={this.state.data} />
+            <NavigationContainer /*initialState={this.state.data} */ >
+                <Stack.Navigator initialRouteName="App" screenOptions=''>
+                    <Stack.Screen name="Home" component={HomeScreen} initialParams={this.state.data} extraData={this.state.data} />
                     <Stack.Screen name="Postagens" component={Postagens2} />
                     {/* <View style={styles.container} >
 
