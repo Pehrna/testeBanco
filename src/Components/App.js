@@ -11,20 +11,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 //https://snack.expo.io/?platform=android&name=Moving%20between%20screens%20%7C%20React%20Navigation&dependencies=%40react-native-community%2Fmasked-view%40%5E0.1.7%2C%40react-navigation%2Fbottom-tabs%40%5E5.6.0%2C%40react-navigation%2Fdrawer%40%5E5.8.3%2C%40react-navigation%2Fmaterial-bottom-tabs%40%5E5.2.11%2C%40react-navigation%2Fmaterial-top-tabs%40%5E5.2.11%2C%40react-navigation%2Fnative%40%5E5.6.0%2C%40react-navigation%2Fstack%40%5E5.6.1%2Creact-native-paper%40%5E3.10.1%2Creact-native-reanimated%40%5E1.7.0%2Creact-native-safe-area-context%40%5E0.7.3%2Creact-native-screens%40%5E2.4.0%2Creact-native-tab-view%40%5E2.14.0&sourceUrl=https%3A%2F%2Freactnavigation.org%2Fexamples%2F5.x%2Fgo-back.js
 
 
-function HomeScreen({ navigation}) {
+function HomeScreen({ navigation}  ,props) {
 
-    var {rep} = [];
+    console.log(props.extraData)
 
-    fetch("https://jsonplaceholder.typicode.com/posts")
-                .then(res => res.json())
-                .then(res => {
-
-                    this.rep = res;
-                    
-                })
-                .catch(err => console.log('Fail', err))
-    
-    
+        
     console.log("Eita");
     var rowsUser = [];
     console.log(navigation)
@@ -90,9 +81,7 @@ export default class App extends Component {
     constructor(props) {
 
         super(props)
-        this.state = {
-            data: []
-        }
+        this.state = {data: []}
     }
 
     componentDidMount() {
