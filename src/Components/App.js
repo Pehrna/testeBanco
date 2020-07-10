@@ -1,26 +1,33 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { FAB } from 'react-native-paper'
+import 'react-tiny-fab/dist/styles.css'
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 
 function HomeScreen({ navigation, route }) {
-
-  console.log(route)
-
-  var projetoHomeScreen = [];
   const [dataHome, setData] = React.useState([]);
-  if (dataHome.length === 0) {
-    fetch("https://jsonplaceholder.typicode.com/posts")
-      .then(res => res.json())
-      .then(res => {
 
-        setData(res);
+  if (route.params === undefined) {
+    console.log('Entra if')
+    if (dataHome.length === 0) {
+      fetch("https://jsonplaceholder.typicode.com/posts")
+        .then(res => res.json())
+        .then(res => {
 
-      })
-      .catch(err => console.log('Fail', err))
+          setData(res);
+
+        })
+        .catch(err => console.log('Fail', err))
+    }
+  } else {
+    console.log('entra else')
+    var { state } = route.params
+    setData(state)
   }
+  var projetoHomeScreen = [];
   var aux = {};
   var rowsUser = [];
   var cont = 0;
@@ -50,7 +57,7 @@ function HomeScreen({ navigation, route }) {
 
           <View style={styles.lineHome}>
             <TouchableOpacity onPress={() => {
-              navigation.navigate('Postagens', {parametro: item.userId, state: projetoHomeScreen})
+              navigation.navigate('Postagens', { parametro: item.userId, state: projetoHomeScreen })
             }} >
               <Text style={styles.infoHome}>Usuario {item.numero} </Text>
             </TouchableOpacity>
@@ -64,22 +71,27 @@ function HomeScreen({ navigation, route }) {
 }
 
 function Postagens({ navigation, route }) {
-  
-  const {parametro} = route.params;
-  const {state} = route.params;
+
+  const { parametro } = route.params;
+  const { state } = route.params;
 
   const [dataPostagem, setDataPostagem] = React.useState(state);
 
   var rowsUser = [];
 
-    for (let i = 0; i < dataPostagem.length; i++) {          
-      if (JSON.stringify(dataPostagem[i].userId) === parametro.slice(4)) {
-        rowsUser.push(dataPostagem[i]);
-      }
+  for (let i = 0; i < dataPostagem.length; i++) {
+    if (JSON.stringify(dataPostagem[i].userId) === parametro.slice(4)) {
+      rowsUser.push(dataPostagem[i]);
     }
+  }
 
   return (
     <View style={styles.containerPostagem} >
+
+      <FAB style={styles.fab} small icon='add' color='white' onPress={() => console.log("Apertei")}>
+       {/* <Icon icon='add' /> */}
+      </FAB>
+
 
       <FlatList
         data={rowsUser}
@@ -87,7 +99,7 @@ function Postagens({ navigation, route }) {
 
           <View style={styles.linePostagens}>
             <TouchableOpacity onPress={() => {
-              navigation.navigate('Editar Postagens', {item})
+              navigation.navigate('Editar Postagens', { item })
             }} >
               {/* Aqui há troca do  (barra N) 
               <Text style={styles.infoPostagem}>{item.body.replace('\n', '/n')}</Text>*/}
@@ -96,20 +108,20 @@ function Postagens({ navigation, route }) {
             </TouchableOpacity>
           </View>
         }
-        keyExtractor={item => 'key:'+item.id}
+        keyExtractor={item => 'key:' + item.id}
       />
 
     </View>
   );
 }
 
-function CreatePostagens({ navigation,route }) {
+function CreatePostagens({ navigation, route }) {
 }
 
-function EditPostagens({ navigation,route }) {
+function EditPostagens({ navigation, route }) {
 
-  const {parametro} = route.params;
-  const {state} = route.params;
+  const { parametro } = route.params;
+  const { state } = route.params;
 
   const [dataCreatePostagem, setDataCreatePostagem] = React.useState(state);
 
@@ -137,7 +149,7 @@ function EditPostagens({ navigation,route }) {
       />
 
     </View>
-  ); 
+  );
 }
 
 const Stack = createStackNavigator();
@@ -185,6 +197,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#2c3e50'
 
   },
+  fab: {
+    position: 'fixed',
+    margin: 10,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'red'
+  },
   infoHome: {
     flexDirection: "column",
     justifyContent: "flex-start",
@@ -229,7 +248,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     justifyContent: "flex-start",
     alignItems: "center",
-    textAlign:'justify'
+    textAlign: 'justify'
   }
 
 })
