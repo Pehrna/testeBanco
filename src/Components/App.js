@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { FlatList, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { FAB } from 'react-native-paper'
+import { FlatList, StyleSheet, View, Text, TouchableOpacity, Button } from 'react-native';
+import { FAB, TextInput } from 'react-native-paper'
 import 'react-tiny-fab/dist/styles.css'
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -11,7 +11,6 @@ function HomeScreen({ navigation, route }) {
   const [dataHome, setData] = React.useState([]);
 
   if (route.params === undefined) {
-    console.log('Entra if')
     if (dataHome.length === 0) {
       fetch("https://jsonplaceholder.typicode.com/posts")
         .then(res => res.json())
@@ -23,7 +22,6 @@ function HomeScreen({ navigation, route }) {
         .catch(err => console.log('Fail', err))
     }
   } else {
-    console.log('entra else')
     var { state } = route.params
     setData(state)
   }
@@ -89,20 +87,16 @@ function Postagens({ navigation, route }) {
     <View style={styles.containerPostagem} >
 
       <FAB style={styles.fab} small icon='add' color='white' onPress={() => console.log("Apertei")}>
-       {/* <Icon icon='add' /> */}
+        {/* <Icon icon='add' /> */}
       </FAB>
-
 
       <FlatList
         data={rowsUser}
         renderItem={({ item }) =>
-
           <View style={styles.linePostagens}>
             <TouchableOpacity onPress={() => {
-              navigation.navigate('Editar Postagens', { item })
-            }} >
-              {/* Aqui há troca do  (barra N) 
-              <Text style={styles.infoPostagem}>{item.body.replace('\n', '/n')}</Text>*/}
+              navigation.navigate('Editar Postagens', { item, dataPostagem })
+            }} >        
               <Text style={styles.infoPostagemTitulo}>{item.title}</Text>
               <Text style={styles.infoPostagem}>{item.body}</Text>
             </TouchableOpacity>
@@ -110,7 +104,6 @@ function Postagens({ navigation, route }) {
         }
         keyExtractor={item => 'key:' + item.id}
       />
-
     </View>
   );
 }
@@ -118,36 +111,55 @@ function Postagens({ navigation, route }) {
 function CreatePostagens({ navigation, route }) {
 }
 
+// function example  () => {
+
+//   useEffect(() => {
+//     Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+//     Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+
+//     return () => {
+//       Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+//       Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+//     };
+//   }, []);
+// }
+
+// handleClick = () => {
+//   if (this.state.color === 'green'){
+//      this.setState({myColor: 'blue'});
+//   } else {
+//      this.setState({myColor: 'green'});
+//   }
+// }
+
 function EditPostagens({ navigation, route }) {
 
-  const { parametro } = route.params;
-  const { state } = route.params;
+  const { item } = route.params;
+  const {dataPostagem} = route.params;
 
-  const [dataCreatePostagem, setDataCreatePostagem] = React.useState(state);
+  const [dataEditPostagem, setDataEditPostagem] = React.useState(dataPostagem);
 
-  var rowsUser = [];
+  var auxBody = item.body;
+  var auxTitle = item.title;
 
   return (
     <View style={styles.containerPostagem} >
 
-      <FlatList
-        data={rowsUser}
-        renderItem={({ item }) =>
-
-          <View style={styles.linePostagens}>
-            <TouchableOpacity onPress={() => {
-              navigation.navigate('Editar Postagens', item)
-            }} >
-              {/* Aqui há troca do  (barra N) 
-              <Text style={styles.infoPostagem}>{item.body.replace('\n', '/n')}</Text>*/}
-              <Text style={styles.infoPostagemTitulo}>{item.title}</Text>
-              <Text style={styles.infoPostagem}>{item.body}</Text>
-            </TouchableOpacity>
-          </View>
-        }
-        keyExtractor={item => "key:" + item.id}
+      <Text style={{ color: 'white' }} >Edite o Titulo</Text>
+      <TextInput    defaultValue={item.title} onChangeText={text =>  auxTitle = text} />
+      <Text style={{ color: 'white' }} >Edite o post</Text>
+      <TextInput    defaultValue={item.body} onChangeText={text =>  auxBody = text} />
+      <Button title='Save' onPress={() => {   
+          for (let i = 0; i < dataPostagem.length; i++) {
+            if (dataPostagem[i].id === item.id) {
+                dataPostagem[i].title = auxTitle;
+                dataPostagem[i].body = auxBody;
+            }
+          }          
+          setDataEditPostagem(dataPostagem); 
+          navigation.navigate('Postagens', { dataEditPostagem }); 
+        }} 
       />
-
     </View>
   );
 }
@@ -166,7 +178,7 @@ export default class App extends React.Component {
 
     //console.log(this.state.data);
     return (
-      <NavigationContainer InitiaState={this.state.data}>
+      <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" >
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Postagens" component={Postagens} />
