@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, View, Text, TouchableOpacity, Button } from 'react-native';
+//import ActionButton from 'react-native-action-button'
 import { FAB, TextInput } from 'react-native-paper'
 import 'react-tiny-fab/dist/styles.css'
+import Swipeout from 'react-native-swipeout'
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -15,9 +17,7 @@ function HomeScreen({ navigation, route }) {
       fetch("https://jsonplaceholder.typicode.com/posts")
         .then(res => res.json())
         .then(res => {
-
           setData(res);
-
         })
         .catch(err => console.log('Fail', err))
     }
@@ -25,6 +25,7 @@ function HomeScreen({ navigation, route }) {
     var { state } = route.params
     setData(state)
   }
+
   var projetoHomeScreen = [];
   var aux = {};
   var rowsUser = [];
@@ -61,6 +62,7 @@ function HomeScreen({ navigation, route }) {
             </TouchableOpacity>
           </View>
         }
+
         keyExtractor={item => item.userId}
       />
 
@@ -86,17 +88,13 @@ function Postagens({ navigation, route }) {
   return (
     <View style={styles.containerPostagem} >
 
-      <FAB style={styles.fab} small icon='add' color='white' onPress={() => console.log("Apertei")}>
-        {/* <Icon icon='add' /> */}
-      </FAB>
-
       <FlatList
         data={rowsUser}
         renderItem={({ item }) =>
           <View style={styles.linePostagens}>
             <TouchableOpacity onPress={() => {
               navigation.navigate('Editar Postagens', { item, dataPostagem })
-            }} >        
+            }} >
               <Text style={styles.infoPostagemTitulo}>{item.title}</Text>
               <Text style={styles.infoPostagem}>{item.body}</Text>
             </TouchableOpacity>
@@ -104,38 +102,75 @@ function Postagens({ navigation, route }) {
         }
         keyExtractor={item => 'key:' + item.id}
       />
+      <View style={styles.linePostagens}>
+        <Text color='#2c3e50'>    </Text>
+      </View>
+
+      <FAB style={styles.fab} icon='add' color='white' onPress={() => { console.log("Apertei"); navigation.navigate('Criar Postagens', {parametro: parametro, state: state } ) } } >
+        {/* <Icon icon='add' /> */}
+      </FAB>
     </View>
   );
 }
 
-function CreatePostagens({ navigation, route }) {
+function compareId(a,b){
+
+  if(a.id < b.id ){
+    return -1;
+  }
+  if(a.id > b.id){
+    return 1;
+  }
+  return 0;
 }
 
-// function example  () => {
+function compareUserId(a,b){
 
-//   useEffect(() => {
-//     Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
-//     Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+  if(a.userId < b.userId ){
+    return -1;
+  }
+  if(a.userId > b.userId){
+    return 1;
+  }
+  return 0;
+}
 
-//     return () => {
-//       Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
-//       Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
-//     };
-//   }, []);
-// }
+function CreatePostagens({ navigation, route }) {
 
-// handleClick = () => {
-//   if (this.state.color === 'green'){
-//      this.setState({myColor: 'blue'});
-//   } else {
-//      this.setState({myColor: 'green'});
-//   }
-// }
+  const { parametro } = route.params;
+  const { state } = route.params;
+  state.sort(compareId)
+  const [dataCreatePostagem, setDataCreatePostagem] = React.useState(state);
+
+  var auxBody ;
+  var auxTitle ;
+  var auxObject ;
+
+  return (
+    <View style={styles.containerPostagem}>
+
+      <Text style={{ color: 'white' }} >Edite o Titulo</Text>
+      <TextInput onChangeText={text => auxTitle = text} />
+      <Text style={{ color: 'white' }} >Edite o post</Text>
+      <TextInput onChangeText={text => auxBody = text} />
+      <Button title='Save' onPress={() => {
+        auxObject = {userId: parseInt(parametro.slice(4),10), id: (state[state.length - 1].id +1), title: auxTitle, body: auxBody }
+        dataCreatePostagem.push(auxObject)
+        dataCreatePostagem.sort(compareUserId)
+        setDataCreatePostagem(dataCreatePostagem);
+        navigation.navigate('Postagens', { dataCreatePostagem });
+      }}
+      />
+    </View>
+
+  )
+
+}
 
 function EditPostagens({ navigation, route }) {
 
   const { item } = route.params;
-  const {dataPostagem} = route.params;
+  const { dataPostagem } = route.params;
 
   const [dataEditPostagem, setDataEditPostagem] = React.useState(dataPostagem);
 
@@ -146,19 +181,19 @@ function EditPostagens({ navigation, route }) {
     <View style={styles.containerPostagem} >
 
       <Text style={{ color: 'white' }} >Edite o Titulo</Text>
-      <TextInput    defaultValue={item.title} onChangeText={text =>  auxTitle = text} />
+      <TextInput defaultValue={item.title} onChangeText={text => auxTitle = text} />
       <Text style={{ color: 'white' }} >Edite o post</Text>
-      <TextInput    defaultValue={item.body} onChangeText={text =>  auxBody = text} />
-      <Button title='Save' onPress={() => {   
-          for (let i = 0; i < dataPostagem.length; i++) {
-            if (dataPostagem[i].id === item.id) {
-                dataPostagem[i].title = auxTitle;
-                dataPostagem[i].body = auxBody;
-            }
-          }          
-          setDataEditPostagem(dataPostagem); 
-          navigation.navigate('Postagens', { dataEditPostagem }); 
-        }} 
+      <TextInput defaultValue={item.body} onChangeText={text => auxBody = text} />
+      <Button title='Save' onPress={() => {
+        for (let i = 0; i < dataPostagem.length; i++) {
+          if (dataPostagem[i].id === item.id) {
+            dataPostagem[i].title = auxTitle;
+            dataPostagem[i].body = auxBody;
+          }
+        }
+        setDataEditPostagem(dataPostagem);
+        navigation.navigate('Postagens', { dataEditPostagem });
+      }}
       />
     </View>
   );
@@ -210,10 +245,10 @@ const styles = StyleSheet.create({
 
   },
   fab: {
-    position: 'fixed',
+    position: 'Fixed',
     margin: 10,
-    right: 0,
-    bottom: 0,
+    right: 20,
+    bottom: 20,
     backgroundColor: 'red'
   },
   infoHome: {
