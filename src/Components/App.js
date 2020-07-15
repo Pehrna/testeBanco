@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { FlatList, StyleSheet, View, Text, TouchableOpacity, Button } from 'react-native';
-//import ActionButton from 'react-native-action-button'
 import { FAB, TextInput } from 'react-native-paper'
 import 'react-tiny-fab/dist/styles.css'
-import Swipeout from 'react-native-swipeout'
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Swipeout from 'react-native-swipeout';
 
 
 function HomeScreen({ navigation, route }) {
@@ -66,6 +65,10 @@ function HomeScreen({ navigation, route }) {
         keyExtractor={item => item.userId}
       />
 
+      <FAB style={styles.fab} icon='add' color='white' onPress={() => { navigation.navigate('Deletar Postagens', { parametro: dataHome, state: state }) }} >
+        {/* <Icon icon='add' /> */}
+      </FAB>
+
     </View>
   );
 }
@@ -91,45 +94,49 @@ function Postagens({ navigation, route }) {
       <FlatList
         data={rowsUser}
         renderItem={({ item }) =>
-          <View style={styles.linePostagens}>
-            <TouchableOpacity onPress={() => {
-              navigation.navigate('Editar Postagens', { item, dataPostagem })
-            }} >
-              <Text style={styles.infoPostagemTitulo}>{item.title}</Text>
-              <Text style={styles.infoPostagem}>{item.body}</Text>
-            </TouchableOpacity>
-          </View>
+          <Swipeout style={styles.swipe} right={[{ text: 'delete', backgroundColor: 'red', color: 'white', onPress: () => console.log('Aperta')}]} >
+
+            <View style={styles.linePostagens}>
+              <TouchableOpacity onPress={() => { navigation.navigate('Editar Postagens', { item, dataPostagem }) }} >
+                <Text style={styles.infoPostagemTitulo}>{item.title}</Text>
+                <Text style={styles.infoPostagem}>{item.body}</Text>
+              </TouchableOpacity>
+            </View>
+          </Swipeout>
+
         }
         keyExtractor={item => 'key:' + item.id}
       />
+
       <View style={styles.linePostagens}>
         <Text color='#2c3e50'>    </Text>
       </View>
 
-      <FAB style={styles.fab} icon='add' color='white' onPress={() => { console.log("Apertei"); navigation.navigate('Criar Postagens', {parametro: parametro, state: state } ) } } >
+      <FAB style={styles.fab} icon='add' color='white' onPress={() => { navigation.navigate('Criar Postagens', { parametro: parametro, state: state }) }} >
         {/* <Icon icon='add' /> */}
       </FAB>
-    </View>
+    </View >
+
   );
 }
 
-function compareId(a,b){
+function compareId(a, b) {
 
-  if(a.id < b.id ){
+  if (a.id < b.id) {
     return -1;
   }
-  if(a.id > b.id){
+  if (a.id > b.id) {
     return 1;
   }
   return 0;
 }
 
-function compareUserId(a,b){
+function compareUserId(a, b) {
 
-  if(a.userId < b.userId ){
+  if (a.userId < b.userId) {
     return -1;
   }
-  if(a.userId > b.userId){
+  if (a.userId > b.userId) {
     return 1;
   }
   return 0;
@@ -142,9 +149,9 @@ function CreatePostagens({ navigation, route }) {
   state.sort(compareId)
   const [dataCreatePostagem, setDataCreatePostagem] = React.useState(state);
 
-  var auxBody ;
-  var auxTitle ;
-  var auxObject ;
+  var auxBody;
+  var auxTitle;
+  var auxObject;
 
   return (
     <View style={styles.containerPostagem}>
@@ -154,7 +161,7 @@ function CreatePostagens({ navigation, route }) {
       <Text style={{ color: 'white' }} >Edite o post</Text>
       <TextInput onChangeText={text => auxBody = text} />
       <Button title='Save' onPress={() => {
-        auxObject = {userId: parseInt(parametro.slice(4),10), id: (state[state.length - 1].id +1), title: auxTitle, body: auxBody }
+        auxObject = { userId: parseInt(parametro.slice(4), 10), id: (state[state.length - 1].id + 1), title: auxTitle, body: auxBody }
         dataCreatePostagem.push(auxObject)
         dataCreatePostagem.sort(compareUserId)
         setDataCreatePostagem(dataCreatePostagem);
@@ -179,7 +186,6 @@ function EditPostagens({ navigation, route }) {
 
   return (
     <View style={styles.containerPostagem} >
-
       <Text style={{ color: 'white' }} >Edite o Titulo</Text>
       <TextInput defaultValue={item.title} onChangeText={text => auxTitle = text} />
       <Text style={{ color: 'white' }} >Edite o post</Text>
@@ -219,6 +225,7 @@ export default class App extends React.Component {
           <Stack.Screen name="Postagens" component={Postagens} />
           <Stack.Screen name="Editar Postagens" component={EditPostagens} />
           <Stack.Screen name="Criar Postagens" component={CreatePostagens} />
+          
         </Stack.Navigator>
       </NavigationContainer >
     );
@@ -234,6 +241,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     textAlignVertical: 'center',
     backgroundColor: '#2c3e50'
+  },
+  swipe: {
+    backgroundColor: '2c3e50'
+
   },
   containerPostagem: {
     width: 360,
