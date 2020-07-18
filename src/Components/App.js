@@ -64,11 +64,6 @@ function HomeScreen({ navigation, route }) {
 
         keyExtractor={item => item.userId}
       />
-
-      <FAB style={styles.fab} icon='add' color='white' onPress={() => { navigation.navigate('Deletar Postagens', { parametro: dataHome, state: state }) }} >
-        {/* <Icon icon='add' /> */}
-      </FAB>
-
     </View>
   );
 }
@@ -79,6 +74,17 @@ function Postagens({ navigation, route }) {
   const { state } = route.params;
 
   const [dataPostagem, setDataPostagem] = React.useState(state);
+
+  // if (route.params === undefined) {
+  //   if (dataPostagem.length === 0) {
+  //     fetch("https://jsonplaceholder.typicode.com/posts?userId=" + parametro)
+  //       .then(res => res.json())
+  //       .then(res => {
+  //         setDataPostagem(res);
+  //       })
+  //       .catch(err => console.log('Fail', err))
+  //   }
+  // }
 
   var rowsUser = [];
 
@@ -94,8 +100,22 @@ function Postagens({ navigation, route }) {
       <FlatList
         data={rowsUser}
         renderItem={({ item }) =>
-          <Swipeout style={styles.swipe} right={[{ text: 'delete', backgroundColor: 'red', color: 'white', onPress: () => console.log('Aperta')}]} >
-
+          <Swipeout style={styles.swipe} 
+          right={[{ 
+            text: 'delete', 
+            backgroundColor: 'red',
+             color: 'white', 
+             onPress: () => {
+               console.log('Aperta');
+               //fetch('https://jsonplaceholder.typicode.com/posts/'+item.id, {method: 'DELETE',});
+               for(var i=0;i<dataPostagem.length;i++){
+                  if (dataPostagem[i].id === item.id){
+                      dataPostagem.splice(i,1);
+                      setDataPostagem(dataPostagem);
+                  }
+               }
+               navigation.navigate('Postagens', {parametro: parametro, state: dataPostagem} );
+               }  }]} >
             <View style={styles.linePostagens}>
               <TouchableOpacity onPress={() => { navigation.navigate('Editar Postagens', { item, dataPostagem }) }} >
                 <Text style={styles.infoPostagemTitulo}>{item.title}</Text>
@@ -113,7 +133,6 @@ function Postagens({ navigation, route }) {
       </View>
 
       <FAB style={styles.fab} icon='add' color='white' onPress={() => { navigation.navigate('Criar Postagens', { parametro: parametro, state: state }) }} >
-        {/* <Icon icon='add' /> */}
       </FAB>
     </View >
 
@@ -165,13 +184,20 @@ function CreatePostagens({ navigation, route }) {
         dataCreatePostagem.push(auxObject)
         dataCreatePostagem.sort(compareUserId)
         setDataCreatePostagem(dataCreatePostagem);
+        // fetch('https://jsonplaceholder.typicode.com/posts', {
+        //   method: 'POST',
+        //   body: auxObject,
+        //   headers: {
+        //     "Content-type": "application/json; charset=UTF-8"
+        //   }
+        // })
+        //   .then(response => response.json())
+        //   .then(json => console.log(json))
         navigation.navigate('Postagens', { dataCreatePostagem });
       }}
       />
     </View>
-
   )
-
 }
 
 function EditPostagens({ navigation, route }) {
@@ -225,7 +251,6 @@ export default class App extends React.Component {
           <Stack.Screen name="Postagens" component={Postagens} />
           <Stack.Screen name="Editar Postagens" component={EditPostagens} />
           <Stack.Screen name="Criar Postagens" component={CreatePostagens} />
-          
         </Stack.Navigator>
       </NavigationContainer >
     );
@@ -308,5 +333,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     textAlign: 'justify'
   }
-
 })
