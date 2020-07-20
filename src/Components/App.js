@@ -1,3 +1,24 @@
+/*
+Segue teste proposto por equipe de tecnologia do BB
+
+Contamos com uma pagina inicial que lista os usuartio. Ao clicar em algum
+dos usuarios, segue uma lista de Posts desse usuario. Ao clicar, segue para 
+pagina de edição desse post. Ao arrastar post para esquerda, habilita-se um 
+botão para deletar. O botão vermelho serve para criação de um novo post do 
+usuario escolhido. 
+
+
+Tudo está em um só arquivo por motivos de hardware. O computador usado 
+pra implementação é antigo e a mudança constante de abas e paginas toma
+muito tempo do processo. Foi decidido que a rolagem do documento seria
+mais rapida pra conclusão do projeto do que o abre e fecha de janelas. 
+Testes foram descartados pois não há resposta de provedor externo. Não 
+há sentido testar somente atribuições simples. Metodos POST, GET, e PUT 
+estão comentados pois não alteram a base de dados usadas. 
+
+Agradeço desde já a oportunidade
+*/
+
 import * as React from 'react';
 import { FlatList, StyleSheet, View, Text, TouchableOpacity, Button } from 'react-native';
 import { FAB, TextInput } from 'react-native-paper'
@@ -100,22 +121,22 @@ function Postagens({ navigation, route }) {
       <FlatList
         data={rowsUser}
         renderItem={({ item }) =>
-          <Swipeout style={styles.swipe} 
-          right={[{ 
-            text: 'delete', 
-            backgroundColor: 'red',
-             color: 'white', 
-             onPress: () => {
-               console.log('Aperta');
-               //fetch('https://jsonplaceholder.typicode.com/posts/'+item.id, {method: 'DELETE',});
-               for(var i=0;i<dataPostagem.length;i++){
-                  if (dataPostagem[i].id === item.id){
-                      dataPostagem.splice(i,1);
-                      setDataPostagem(dataPostagem);
+          <Swipeout style={styles.swipe}
+            right={[{
+              text: 'delete',
+              backgroundColor: 'red',
+              color: 'white',
+              onPress: () => {
+                //fetch('https://jsonplaceholder.typicode.com/posts/'+item.id, {method: 'DELETE',});
+                for (var i = 0; i < dataPostagem.length; i++) {
+                  if (dataPostagem[i].id === item.id) {
+                    dataPostagem.splice(i, 1);
+                    setDataPostagem(dataPostagem);
                   }
-               }
-               navigation.navigate('Postagens', {parametro: parametro, state: dataPostagem} );
-               }  }]} >
+                }
+                navigation.navigate('Postagens', { parametro: parametro, state: dataPostagem });
+              }
+            }]} >
             <View style={styles.linePostagens}>
               <TouchableOpacity onPress={() => { navigation.navigate('Editar Postagens', { item, dataPostagem }) }} >
                 <Text style={styles.infoPostagemTitulo}>{item.title}</Text>
@@ -221,6 +242,15 @@ function EditPostagens({ navigation, route }) {
           if (dataPostagem[i].id === item.id) {
             dataPostagem[i].title = auxTitle;
             dataPostagem[i].body = auxBody;
+            // fetch('https://jsonplaceholder.typicode.com/posts/' + item.id, {
+            //   method: 'PUT',
+            //   body: dataPostagem[i],
+            //   headers: {
+            //     "Content-type": "application/json; charset=UTF-8"
+            //   }
+            // })
+            //   .then(response => response.json())
+            //   .then(json => console.log(json))
           }
         }
         setDataEditPostagem(dataPostagem);
@@ -242,8 +272,6 @@ export default class App extends React.Component {
   }
 
   render() {
-
-    //console.log(this.state.data);
     return (
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home" >
